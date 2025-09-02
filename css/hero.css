@@ -1,0 +1,43 @@
+/* ========== HERO SECTION ========== */
+.hero {
+  height: 100vh;
+  background: url('../images/your-photo.jpg') no-repeat center center/cover;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+.hero-overlay h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero-overlay p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.book-btn {
+  padding: 0.8rem 1.5rem;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 25px;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  font-size: 1.2rem;
+  opacity: 0.8;
+}

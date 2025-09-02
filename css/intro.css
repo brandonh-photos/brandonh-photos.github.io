@@ -1,0 +1,65 @@
+/* ========== INTRO SECTION ========== */
+.intro-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f4ede6;
+  padding: 80px;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.intro-text {
+  flex: 1 1 400px;
+  font-family: 'Georgia', serif;
+  color: #333;
+}
+
+.intro-text h2 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+.intro-text h2 span {
+  font-weight: bold;
+  display: block;
+}
+
+.subtitle {
+  font-size: 1rem;
+  margin: 10px 0;
+  font-style: italic;
+}
+
+.description {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  max-width: 500px;
+}
+
+.read-more {
+  text-decoration: none;
+  color: white;
+  background: #333;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.intro-images {
+  flex: 1 1 300px;
+  position: relative;
+}
+
+.main-img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.inset-img {
+  width: 120px;
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}

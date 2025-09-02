@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Checkout</title>
+<style>
+  :root{
+    --fg:#0b0b0c; --bg:#f7f7f8; --card:#fff; --muted:#6b7280; --border:#e5e7eb;
+    --radius:16px; --r-pill:999px;
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+  .wrap{width:min(1200px,100%);margin:clamp(12px,3vw,28px) auto;padding:0 16px}
+
+  .grid{display:grid;gap:24px}
+  @media (min-width:980px){ .grid{grid-template-columns:1.1fr 1fr} }
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .pane{padding:24px}
+
+  /* LEFT (total) */
+  .total-wrap{padding:24px}
+  .brand{font-weight:600;margin-bottom:6px}
+  .grand{font-size:40px;font-weight:800;margin:4px 0 14px}
+  .items{display:grid;gap:14px}
+  .it{display:flex;justify-content:space-between;align-items:center;border:1px solid #f1f1f1;border-radius:12px;padding:12px 14px}
+  .it .name{font-weight:600}
+  .it .qty{color:var(--muted);font-size:.9rem}
+
+  /* RIGHT (summary table) */
+  h1{margin:0 0 .4rem;font-size:clamp(1.25rem,1.6vw,1.6rem)}
+  .muted{color:var(--muted)}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:14px 16px;border-bottom:1px solid #f0f0f0;text-align:left}
+  th{width:34%;background:#fafafa;color:#374151}
+  .badge{display:inline-block;background:#eef6ff;color:#064d99;padding:.25rem .6rem;border-radius:999px;font-size:.85rem}
+  .price{font-weight:700}
+
+  /* Payment selector */
+  .pay-section{margin-top:18px}
+  .pay-title{font-size:1.6rem;font-weight:800;margin:14px 0}
+  .pills{display:grid;gap:14px}
+  .pill{position:relative}
+  .pill input{position:absolute;inset:0;opacity:0}
+  .pill label{
+    display:flex;align-items:center;gap:12px;
+    border:2px solid transparent;border-radius:40px;padding:14px 18px;
+    font-weight:800;text-transform:lowercase; cursor:pointer;
+  }
+  .pill input:checked + label{box-shadow:0 0 0 4px rgba(0,0,0,.08)}
+  .dot{width:16px;height:16px;border:2px solid #000;border-radius:50%;}
+  .pill input:checked + label .dot{background:#2d2df0;border-color:#2d2df0}
+  .icon{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px}
+  .i-cashapp{background:#00D632;color:#001;font-weight:900}
+  .i-paypal{background:#003087;color:#fff;font-weight:700}
+  .i-apple{background:#000;color:#fff;font-weight:700;font-size:14px}
+  .i-zelle{background:#6f2dbd;color:#fff;font-weight:700}
+
+  /* Reveal boxes */
+  .reveal{display:none;margin-top:6px;border-left:4px solid #000;padding:12px 14px;border-radius:12px;background:#fafafa}
+  .code{font-family:ui-monospace,Menlo,Consolas,monospace;background:#f3f4f6;border:1px solid #e5e7eb;padding:.35rem .55rem;border-radius:10px}
+  .btn{border:1px solid #ddd;background:#fff;padding:.55rem .9rem;border-radius:999px;cursor:pointer}
+  .btn.primary{background:#000;color:#fff;border-color:#000}
+  .links{margin-top:10px}
+  .a{color:#064d99;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="grid">
+    <!-- LEFT: total + items -->
+    <div class="card">
+      <div class="total-wrap">
+        <div class="brand">Pay Powder (example)</div>
+        <div class="grand" id="grand">$0.00</div>
+        <div class="items">
+          <div class="it">
+            <div>
+              <div class="name" id="itemName">Photo package</div>
+              <div class="qty">Qty 1</div>
+            </div>
+            <div class="price" id="itemPrice">$0.00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: details + payment -->
+    <div class="card">
+      <div class="pane">
+        <h1>Confirm your details & pay</h1>
+        <p class="muted">Check your info and choose your payment method below.</p>
+
+        <table>
+          <tbody>
+            <tr><th>Package</th><td><span id="pkgLabel" class="badge"></span> — <span id="pkgPrice" class="price"></span></td></tr>
+            <tr><th>Name</th><td><span id="firstName"></span> <span id="lastName"></span></td></tr>
+            <tr><th>Instagram</th><td id="instagram"></td></tr>
+            <tr><th>Phone</th><td id="phone"></td></tr>
+            <tr><th>School / Club</th><td id="school"></td></tr>
+            <tr><th>Game Time</th><td id="gameTime"></td></tr>
+            <tr><th>Location</th><td id="location"></td></tr>
+          </tbody>
+        </table>
+
+        <div class="pay-section">
+          <div class="pay-title">Choose Payment Type</div>
+
+          <div class="pills">
+            <!-- Cash App -->
+            <div class="pill">
+              <input type="radio" name="pm" id="pm-cashapp" checked />
+              <label for="pm-cashapp">
+                <span class="dot"></span>
+                <span class="icon i-cashapp">$</span>
+                <span>Cash App</span>
+              </label>
+              <div class="reveal" id="box-cashapp">
+                Send <b id="amtCA">$0.00</b> to <span class="code" id="cashTag">$yourcashtag</span>.
+                <div class="links"><button class="btn" id="copyCash">Copy tag</button> <button class="btn" id="openCash">Open Cash App</button></div>
+              </div>
+            </div>
+
+            <!-- PayPal -->
+            <div class="pill">
+              <input type="radio" name="pm" id="pm-paypal" />
+              <label for="pm-paypal">
+                <span class="dot"></span>
+                <span class="icon i-paypal">PP</span>
+                <span>paypal</span>
+              </label>
+              <div class="reveal" id="box-paypal">
+                Pay <b id="amtPP">$0.00</b> via PayPal.
+                <div class="links"><a class="a" id="payPalLink" target="_blank" rel="noopener">Open PayPal</a></div>
+              </div>
+            </div>
+
+            <!-- Zelle -->
+            <div class="pill">
+              <input type="radio" name="pm" id="pm-zelle" />
+              <label for="pm-zelle">
+                <span class="dot"></span>
+                <span class="icon i-zelle">Z</span>
+                <span>zelle</span>
+              </label>
+              <div class="reveal" id="box-zelle">
+                Send <b id="amtZE">$0.00</b> to <span class="code" id="zelleHandle">zelle@example.com</span>.
+                <div class="links"><button class="btn" id="copyZelle">Copy handle</button></div>
+              </div>
+            </div>
+
+            <!-- Apple Pay (note) -->
+            <div class="pill">
+              <input type="radio" name="pm" id="pm-apple" />
+              <label for="pm-apple">
+                <span class="dot"></span>
+                <span class="icon i-apple"></span>
+                <span>apple pay</span>
+              </label>
+              <div class="reveal" id="box-apple">
+                To accept Apple Pay on your site, integrate Stripe (Payment Element/Checkout). For now use one of the methods above.
+              </div>
+            </div>
+
+            <!-- Cash -->
+            <div class="pill">
+              <input type="radio" name="pm" id="pm-cash" />
+              <label for="pm-cash">
+                <span class="dot"></span>
+                <span class="icon" style="border:2px solid #333">💵</span>
+                <span>cash</span>
+              </label>
+              <div class="reveal" id="box-cash">
+                Bring exact change: <b id="amtCash">$0.00</b>. We’ll confirm at the game.
+              </div>
+            </div>
+          </div><!-- pills -->
+        </div><!-- pay-section -->
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // ==== SETTINGS (edit these) ====
+  const PAYPAL_LINK   = "https://paypal.me/yourname";
+  const CASHAPP_TAG   = "$brand0nh972";
+  const ZELLE_HANDLE  = "zelle@example.com";
+  const PACKAGES = {
+    "5pic":  { label: "5 Photo Package",  price: 15 },
+    "10pic": { label: "10 Photo Package", price: 30 },
+    "unlim": { label: "Unlimited Package", price: 45 },
+    "group": { label: "Team / Group Package", price: 160 }
+  };
+  // ===============================
+
+  const fmt = n => `$${(+n).toFixed(2)}`;
+  const esc = s => String(s||"").replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+
+  // Format gameTime nicely
+  function formatGameTime(raw) {
+    if (!raw) return "";
+    const d = new Date(raw);
+    if (isNaN(d)) return raw; // fallback
+    const opts = { 
+      month: "long", day: "numeric", year: "numeric", 
+      hour: "numeric", minute: "2-digit", hour12: true 
+    };
+    return d.toLocaleString("en-US", opts);
+  }
+
+  // Load data & package
+  const data = JSON.parse(localStorage.getItem("bookingInfo") || "{}");
+  if (!data.firstName) window.location.href = "./form.html";
+  const pkgCode = new URLSearchParams(location.search).get("pkg") || data.package || "custom";
+  const pkg = PACKAGES[pkgCode] || { label: pkgCode, price: 0 };
+
+  // Fill left total
+  document.getElementById("grand").textContent = fmt(pkg.price);
+  document.getElementById("itemName").textContent = pkg.label;
+  document.getElementById("itemPrice").textContent = fmt(pkg.price);
+
+  // Fill right summary
+  document.getElementById("pkgLabel").textContent = pkg.label;
+  document.getElementById("pkgPrice").textContent = fmt(pkg.price);
+  document.getElementById("firstName").textContent = esc(data.firstName);
+  document.getElementById("lastName").textContent = esc(data.lastName||"");
+  document.getElementById("instagram").textContent = esc(data.instagram||"");
+  document.getElementById("phone").textContent = esc(data.phone||"");
+  document.getElementById("school").textContent = esc(data.school||"");
+  document.getElementById("gameTime").textContent = formatGameTime(data.gameTime);
+  document.getElementById("location").textContent = esc(data.location||"");
+
+  // Payment details
+  document.getElementById("amtCA").textContent   = fmt(pkg.price);
+  document.getElementById("amtPP").textContent   = fmt(pkg.price);
+  document.getElementById("amtZE").textContent   = fmt(pkg.price);
+  document.getElementById("amtCash").textContent = fmt(pkg.price);
+  document.getElementById("cashTag").textContent = CASHAPP_TAG;
+  document.getElementById("zelleHandle").textContent = ZELLE_HANDLE;
+
+  // PayPal link (kept as-is)
+  const pp = document.getElementById("payPalLink");
+  pp.href = PAYPAL_LINK + (PAYPAL_LINK.includes("?") ? "&" : "?") + "amount=" + encodeURIComponent(pkg.price);
+
+  // Build Cash App fallback URL with amount prefilled
+  const amountForCashApp = String(Number(pkg.price || 0));          // "30"
+  const cashTagSans$ = CASHAPP_TAG.replace(/^\$/,'');               // "brand0nh972"
+  const cashAppUrl = `https://cash.app/$${cashTagSans$}/${encodeURIComponent(amountForCashApp)}`;
+
+  // Copy/open helpers
+  document.getElementById("copyCash").onclick = async ()=>{ 
+    await navigator.clipboard.writeText(CASHAPP_TAG); 
+    alert("Copied: " + CASHAPP_TAG); 
+  };
+  document.getElementById("openCash").onclick = ()=>{
+    // Try to open native app; if not, open the web URL with amount
+    location.href = "cashapp://";
+    setTimeout(()=>window.open(cashAppUrl, "_blank"), 600);
+  };
+  document.getElementById("copyZelle").onclick = async ()=>{ 
+    await navigator.clipboard.writeText(ZELLE_HANDLE); 
+    alert("Copied: " + ZELLE_HANDLE); 
+  };
+
+  // Reveal logic
+  const radios = document.querySelectorAll('input[name="pm"]');
+  const boxes = {
+    "pm-cashapp":"box-cashapp",
+    "pm-paypal":"box-paypal",
+    "pm-zelle":"box-zelle",
+    "pm-apple":"box-apple",
+    "pm-cash":"box-cash"
+  };
+  function showBox(id){
+    Object.values(boxes).forEach(b=>document.getElementById(b).style.display="none");
+    document.getElementById(boxes[id]).style.display="block";
+  }
+  radios.forEach(r=>r.addEventListener("change", ()=>showBox(r.id)));
+  showBox("pm-cashapp"); // default visible
+</script>

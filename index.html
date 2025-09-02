@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>brandonh.photos</title>
+
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/header.css" />
+  <link rel="stylesheet" href="css/hero.css" />
+  <link rel="stylesheet" href="css/intro.css" />
+  <link rel="stylesheet" href="css/slideshow.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- DESKTOP LAYOUT -->
+  <div class="desktop-view">
+    <div class="hero">
+
+      <!-- Background Slideshow -->
+      <div class="slideshow">
+        <img src="images/IMG_0929.jpg" class="slide active" />
+        <img src="images/IMG_1498.jpg" class="slide" />
+        <img src="images/IMG_2688.jpg" class="slide" />
+        <img src="images/IMG_5333.jpg" class="slide" />
+      </div>
+
+      <!-- Dots -->
+      <div class="slideshow-dots">
+        <div class="dot" data-index="0"><span class="progress"></span></div>
+        <div class="dot" data-index="1"><span class="progress"></span></div>
+        <div class="dot" data-index="2"><span class="progress"></span></div>
+        <div class="dot" data-index="3"><span class="progress"></span></div>
+      </div>
+
+      <!-- Top Socials -->
+      <div class="top-social fade-in">
+        <a href="https://www.tiktok.com/@brandonh.photos" target="_blank" class="icon-btn"><i class="fab fa-tiktok"></i></a>
+        <a href="https://www.instagram.com/brandonh.photos/" target="_blank" class="icon-btn"><i class="fab fa-instagram"></i></a>
+      </div>
+
+      <!-- Header Nav -->
+      <header class="fade-in">
+        <div class="logo-container">
+          <img src="images/logo.png" alt="Logo" class="site-logo">
+          <span class="brand-name">brandonh.photos</span>
+        </div>
+        <nav class="overlay-nav">
+          <a href="#">Portfolio</a>
+          <a href="#">Gallery</a>
+          <a href="#">Book a Session</a>
+          <a href="#">Contact</a>
+        </nav>
+      </header>
+
+      <!-- Hero Overlay -->
+      <div class="overlay">
+        <h1 class="fade-in"><span>CAPTURE.</span><br><strong>CREATE. INSPIRE.</strong></h1>
+        <div class="text-with-line fade-in">
+          <div class="v-line"></div>
+          <p>Every photo I take isn’t just a picture — it’s your story, your energy, and your emotion, frozen in time so you never lose the moment.</p>
+        </div>
+        <div class="buttons fade-in">
+          <button class="filled">Explore all trips</button>
+          <button class="outlined">Explore packages</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro Section -->
+  <section class="intro-section">
+    <div class="intro-text">
+      <h2>Nostalgic Storytelling<br><span>For the Carefree and Adventurous.</span></h2>
+      <p class="subtitle">Wedding & Elopement Photographer and Videographer based in Kansas City</p>
+      <p class="description">
+        The one that loves the untraditional, all about joy-filled wedding days, and cozy road trips.
+      </p>
+      <a href="#" class="read-more">Read More →</a>
+    </div>
+    <div class="intro-images">
+      <img src="images/AVA_1672.jpg" alt="Photographer" class="main-img">
+      <img src="images/inset-portrait.jpg" alt="Inset" class="inset-img">
+    </div>
+  </section>
+
+  <!-- SLIDESHOW SCRIPT -->
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    let currentSlide = 0;
+    let interval;
+
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.remove('active');
+        dots[i].classList.remove('active');
+        dots[i].querySelector('.progress').style.width = '0%';
+      });
+
+      slides[index].classList.add('active');
+      dots[index].classList.add('active');
+      dots[index].querySelector('.progress').style.width = '100%';
+      currentSlide = index;
+    }
+
+    function startSlideshow() {
+      interval = setInterval(() => {
+        const nextSlide = (currentSlide + 1) % slides.length;
+        showSlide(nextSlide);
+      }, 4000);
+    }
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        clearInterval(interval);
+        showSlide(parseInt(dot.dataset.index));
+        startSlideshow();
+      });
+    });
+
+    showSlide(0);
+    startSlideshow();
+  </script>
+</body>
+</html>
